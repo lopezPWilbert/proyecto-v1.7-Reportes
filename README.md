@@ -12,6 +12,7 @@ programacion web
 1.6.1 Filtros listos y tablas para votos  
 1.6.2 Sistema de votos listos  
 1.6.3 Nivel de reputacion lista  
+1.7  Agregado reportes y filtro nuevo
 *	Falta validar formulario triple  
 *	Agregar decorador de login aceptado  
 *   Si hay saltos de linea o acentos en la descripcion o titulo, se arruina todo.
