@@ -20,31 +20,34 @@ class Usuario_m(models.Model):
 
 
 class Denuncia_m(models.Model):
-	user=models.ForeignKey(User)
-	titulo=models.CharField(max_length=50)
-	descripcion=models.TextField()
-	latitud=models.FloatField()
-	longitud=models.FloatField()
-	lista_categorias=(
+    user=models.ForeignKey(User)
+    titulo=models.CharField(max_length=50)
+    descripcion=models.TextField()
+    latitud=models.FloatField()
+    longitud=models.FloatField()
+    lista_categorias=(
         (1,'Reten'),
-		(2,'Bache'),
-		(3,'Accidente'),
-		(4,'Reparaciones'),
-		(5,'Evento'),
-		(6,'Otro')
+        (2,'Bache'),
+        (3,'Accidente'),
+        (4,'Reparaciones'),
+        (5,'Evento'),
+        (6,'Otro')
         )
-	categoria=models.IntegerField(choices=lista_categorias, verbose_name=u"Categoria",null=True, blank=True)
-	lista_nivel=(
-		(1,'Totalmente bloqueado'),
-		(2,'Parcialmente bloqueado'),
-		(3,'Ninguno')
-		)
-	nivel=models.IntegerField(choices=lista_nivel, verbose_name=u"Nivel",null=True, blank=True)
-	#1.6.1 Votos y rangos
-	estado=models.NullBooleanField(verbose_name=u"Activado",null=True, blank=True)
+    categoria=models.IntegerField(choices=lista_categorias, verbose_name=u"Categoria",null=True, blank=True)
+    lista_nivel=(
+        (1,'Totalmente bloqueado'),
+        (2,'Parcialmente bloqueado'),
+        (3,'Ninguno')
+        )
+    nivel=models.IntegerField(choices=lista_nivel, verbose_name=u"Nivel",null=True, blank=True)
+    #1.6.1 Votos y rangos
+    estado=models.NullBooleanField(verbose_name=u"Activado",null=True, blank=True)
+    #1.7 Reportes
+    fecha=models.DateTimeField(auto_now=True)
+    reportado=models.NullBooleanField(verbose_name=u"Reportado",null=True, blank=True)
 
-	def __unicode__(self):
-		return self.titulo
+    def __unicode__(self):
+        return self.titulo
 
 class imagenes_m(models.Model):
     denunciaA=models.ForeignKey(Denuncia_m, null=True, blank=True)
@@ -68,16 +71,24 @@ class Comentario_m(models.Model):
 
 #1.6.1 Likes, rangos y reportados
 class Rango_m(models.Model):
-    usuario=models.ForeignKey(User,null=True, blank=True)
-    buenos=models.IntegerField(null=True, blank=True)
-    malos=models.IntegerField(null=True, blank=True)
+	usuario=models.ForeignKey(User,null=True, blank=True)
+	buenos=models.IntegerField(null=True, blank=True)
+	malos=models.IntegerField(null=True, blank=True)
+	#1.7 Reportes
+	fecha=models.DateTimeField(auto_now=True)
 class Favor_m(models.Model):
-    usuario=models.ForeignKey(User,null=True, blank=True)
-    denuncia=models.ForeignKey(Denuncia_m,null=True, blank=True)
+	usuario=models.ForeignKey(User,null=True, blank=True)
+	denuncia=models.ForeignKey(Denuncia_m,null=True, blank=True)
+	#1.7 Reportes
+	fecha=models.DateTimeField(auto_now=True)
 class Contra_m(models.Model):
-    usuario=models.ForeignKey(User,null=True, blank=True)
-    denuncia=models.ForeignKey(Denuncia_m,null=True, blank=True)
+	usuario=models.ForeignKey(User,null=True, blank=True)
+	denuncia=models.ForeignKey(Denuncia_m,null=True, blank=True)
+	#1.7 Reportes
+	fecha=models.DateTimeField(auto_now=True)
 class Reportados_m(models.Model):
     usuario=models.ForeignKey(User,null=True, blank=True)
     denuncia=models.ForeignKey(Denuncia_m,null=True, blank=True)
+    #1.7 Reportes
+    fecha=models.DateTimeField(auto_now=True)
 #Fin 1.6.1

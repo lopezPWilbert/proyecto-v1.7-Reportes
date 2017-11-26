@@ -23,7 +23,7 @@ from allauth.account.views import *
 
 urlpatterns = [
 	#1.6 FIltros
-	url(r'^filtro/([0-9])/$', app.views.Filtro, name='filtro'),
+	url(r'^filtro/([0-9]*)/$', app.views.Filtro, name='filtro'),
 	#Fin 1.6
 	url(r'insertar/', app.views.insertar, name='insertar'),
     url(r'contador/', app.views.contador.as_view(), name='contador'),

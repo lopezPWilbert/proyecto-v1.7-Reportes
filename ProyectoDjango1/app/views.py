@@ -16,6 +16,8 @@ from allauth.socialaccount.models import SocialAccount
 
 from django.db import connection,transaction
 from django.contrib.auth.models import User
+#1.7 reportes
+from django.db.models import Q
 
 @login_required(login_url=reverse_lazy('account_login'), redirect_field_name=None)
 def Denuncia(request):
@@ -37,19 +39,32 @@ def Denuncia(request):
 
     return render(request, 'app/denuncia.html',{'form':form,'form2':form2, 'form3':form3})
 
+#1.7 Reportes
+def MasVotadas():
+    object_list=Denuncia_m.objects.raw("select count(f.denuncia_id) as x, f.id as y, f.denuncia_id as w,f.usuario_id as z, f.fecha as q,d.* from app_favor_m f, app_denuncia_m d where f.denuncia_id=d.id group by f.denuncia_id order by x desc,f.fecha desc limit 0,10")
+    ctx=Denuncia_m.objects.raw("select * from app_denuncia_m o where o.id='%s'"%(10))
+    return object_list
+#Fin 1.7
 
 #1.6 Filtros
 
 def Filtro(request, cat):
-	object_list=Denuncia_m.objects.filter(categoria=cat)
-	return render(request, 'app/mapa.html', {'object_list':object_list})
+    if cat=="100":
+        object_list=MasVotadas()
+    else:
+        object_list=Denuncia_m.objects.filter(categoria=cat)
+    return render(request, 'app/mapa.html', {'object_list':object_list})
 
 #Fin ver 1.6
 
 
 class Mapa(ListView):
-    template_name='app/mapa.html'
-    model=Denuncia_m
+	template_name='app/mapa.html'
+	model=Denuncia_m
+	#1.7 reportes
+	def get_queryset(self):
+		queryset = super(Mapa, self).get_queryset()
+		return queryset.filter(Q(estado=True)|Q(estado=None))
 
 class contador(ListView):
     template_name='app/contador.html'
@@ -122,6 +137,7 @@ def Noticia(request,pk):
 				r.denuncia_id=pk
 				r.usuario_id=request.user.id
 				r.save()
+				Denuncia_m.objects.filter(pk=pk).update(reportado=True)
 	x,ninguno,favor,ob_favor, ob_contra, reportado=consultaVotos(request, pk)
     #fin 1.6.2
 	#1.6.3 Reportes
@@ -159,15 +175,18 @@ def consultaVotos(request, pk):
 #Fin 1.6.2
 #1.6.3 Reportes
 def reputacion(request, pk):
-	usuario_reportado=Denuncia_m.objects.filter(id=pk)
-	usuario_r_id=usuario_reportado[0].user_id
-	buenos=Favor_m.objects.filter(denuncia__user=usuario_r_id).count()
-	malos_contra=Contra_m.objects.filter(denuncia__user=usuario_r_id).count()
-	malos_reportados=Reportados_m.objects.filter(denuncia__user=usuario_r_id).count()
-	malos=malos_contra+(malos_reportados*10)
+    usuario_reportado=Denuncia_m.objects.filter(id=pk)
+    usuario_r_id=usuario_reportado[0].user_id
+    buenos=Favor_m.objects.filter(denuncia__user=usuario_r_id).count()
+    malos_contra=Contra_m.objects.filter(denuncia__user=usuario_r_id).count()
+    malos_reportados=Reportados_m.objects.filter(denuncia__user=usuario_r_id).count()
+    malos=malos_contra+(malos_reportados*10)
 
-	nivel=buenos*100/(malos+buenos)
-	return nivel
+    try:
+        nivel=buenos*100/(malos+buenos)
+    except:
+        nivel=0
+    return nivel
 #fin 1.6.3
 def PerfilUser(request):
 	ctx=Usuario_m.objects.raw("select * from app_usuario_m o where o.Nombre_id='%s'"%(request.user.id))
